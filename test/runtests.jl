@@ -34,4 +34,5 @@ include("puzzles/lastresort.jl")
 include("puzzles/podofdolphins.jl")
 include("puzzles/rubik.jl")
 include("puzzles/wallstreet.jl")
+include("puzzles/eggplant.jl")
 

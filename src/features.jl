@@ -11,6 +11,7 @@ function allfeatures()
         @feature((vowel_pattern(word, (true, false)) || vowel_pattern(word, (false, true))), "alternates consonant vowel")
         @feature((vowel_pattern(word, p) for p in ((true, false), 
                                                    (false, true))), "has vowel/consonant pattern $p")
+        @feature(contains_letter_pattern_aba(word), "contains ABA letter pattern")
         @feature((num_double_letters(word) == j for j in 1:3), "contains $j double letters")
         @feature((num_repeats(letter_tallies(word), i) == j for j in 1:5, i in 2:4), "has $j letters repeated at least $i times each")
         @feature((num_repeats_strict(letter_tallies(word), i) == j for j in 1:5, i in 2:4), "has $j letters repeated exactly $i times each")
@@ -188,6 +189,15 @@ function vowel_pattern(word, pattern)
         end
     end
     true
+end
+
+function contains_letter_pattern_aba(word)
+    for i in 1:(length(word) - 2)
+        if word[i] == word[i+2]
+            return true
+        end
+    end
+    false
 end
 
 function num_double_letters(word)
