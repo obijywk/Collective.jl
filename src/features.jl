@@ -1,3 +1,5 @@
+using DataStructures: Trie
+
 function allfeatures()
     Feature[
         @feature((scrabble_score(word) == j for j in 1:26), "has scrabble score $j")
@@ -45,6 +47,8 @@ function allfeatures()
         @feature(ismatch(ENTIRELY_STATES_REGEX, word), "can be completely broken down into US state abbreviations")
         @feature((num_state_abbreviations(word) == j for j in 1:5), "contains $j US state abbreviations")
         @feature(in(word, MA_BELL_EXCHANGES_SET), "is a Ma Bell recommended telephone exchange name")
+        @feature((has_category_word(category, word) for category in keys(CATEGORIES_MAP)), "contains a word from category '$category'")
+        @feature((has_category_word_letters(category, word) for category in keys(CATEGORIES_MAP)), "contains letters of a word from category '$category'")
         @feature((has_transaddition(BitsTally(word), c) for c in 'a':'z'), "has a transaddition with letter '$c'")
         @feature((has_transdeletion(BitsTally(word), c) for c in 'a':'z'), "has a transdeletion with letter '$c'")
         @feature(has_transaddition(BitsTally(word)), "has a 1-letter transaddition")
@@ -141,6 +145,13 @@ const ENTIRELY_STATES_REGEX = Regex("^($(join((parenwrap(s) for s in STATE_ABBRE
 const GREEK_REGEX = r"(alpha)|(beta)|(gamma)|(delta)|(epsilon)|(zeta)|(eta)|(theta)|(iota)|(kappa)|(lambda)|(mu)|(nu)|(omicron)|(pi)|(rho)|(sigma)|(tau)|(upsilon)|(phi)|(chi)|(psi)|(omega)"
 
 const MA_BELL_EXCHANGES_SET = Set(lowercase.(readdlm(joinpath(Pkg.dir("Collective"), "data", "ma_bell_exchanges.tsv"), '\t', String)))
+
+const CATEGORIES_MAP = Dict{String, Trie{Void}}()
+for filename in readdir(joinpath(Pkg.dir("Collective"), "data", "categories"))
+    const category = splitext(filename)[1]
+    const words = lowercase.(vec(readdlm(joinpath(Pkg.dir("Collective"), "data", "categories", filename))))
+    CATEGORIES_MAP[category] = Trie(words)
+end
 
 isconsonant(char) = char in CONSONANTS_SET
 isvowel(char) = char in VOWELS_SET
@@ -409,4 +420,45 @@ function num_state_abbreviations(word)
     i = 0
     foreach(m -> i += 1, eachmatch(SINGLE_STATE_REGEX, word, true))
     i
+end
+
+function has_category_word(category, word)
+    const category_trie = CATEGORIES_MAP[category]
+    subtries = Trie{Void}[]
+    for c in word
+        push!(subtries, category_trie)
+        next_subtries = Trie{Void}[]
+        for t in subtries
+            if haskey(t.children, c)
+                st = t.children[c]
+                if st.is_key
+                    return true
+                end
+                push!(next_subtries, st)
+            end
+        end
+        subtries = next_subtries
+    end
+    false
+end
+
+function has_category_word_letters(category, word)
+    const category_trie = CATEGORIES_MAP[category]
+    subtries = Trie{Void}[]
+    for c in word
+        push!(subtries, category_trie)
+        next_subtries = Trie{Void}[]
+        for t in subtries
+            push!(next_subtries, t)
+            if haskey(t.children, c)
+                st = t.children[c]
+                if st.is_key
+                    return true
+                end
+                push!(next_subtries, st)
+            end
+        end
+        subtries = next_subtries
+    end
+    false
 end
