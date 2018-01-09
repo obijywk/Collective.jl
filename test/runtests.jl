@@ -12,6 +12,7 @@ function best_feature(wordlist, allowed_misses=length(wordlist))
     minimum(results)
 end
 
+include("letter_additions.jl")
 include("states.jl")
 include("puzzles/squared_key.jl")
 include("puzzles/respect.jl")

@@ -54,6 +54,8 @@ function allfeatures()
         @feature(has_transaddition(BitsTally(word)), "has a 1-letter transaddition")
         @feature(has_transdeletion(BitsTally(word)), "has a 1-letter transdeletion")
         @feature(in(word, UNICODE_CHARACTERS), "is the name of a unicode character")
+        @feature((in("$c$word", WORDS_SET) for c in 'a':'z'), "is a word when prefixed with '$c'")
+        @feature((in("$word$c", WORDS_SET) for c in 'a':'z'), "is a word when suffixed with '$c'")
         ]
 end
 
@@ -106,6 +108,7 @@ const ELEMENTAL_SYMBOLS = lowercase.(strip.(ELEMENT_DATA[:,2]))
 const STATES_DATA = readdlm(joinpath(Pkg.dir("Collective"), "data", "states.tsv"), '\t', String, skipstart=1)
 const STATE_ABBREVIATIONS = strip.(lowercase.(STATES_DATA[:,2]))
 const WORDS = wordlist(open(joinpath(Pkg.dir("Collective"), "data", "113809of.fic")))
+const WORDS_SET = Set(WORDS)
 const UNICODE_CHAR_DATA = readdlm(joinpath(Pkg.dir("Collective"), "data", "unicode_characters.tsv"), '\t', String, skipstart=1)
 const UNICODE_CHARACTERS = Set(cleanup.(UNICODE_CHAR_DATA[:,1]))
 
