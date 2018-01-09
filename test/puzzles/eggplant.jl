@@ -11,4 +11,10 @@
 
     f = best_feature(["brazen", "coatimundi", "hatred", "socket", "vestibule"], 0)
     @test f.description == "contains a word from category 'clothing'"
+
+    f = best_feature(["edens", "emanate", "gratin", "rancho", "select"], 0)
+    @test f.description == "is a word when first letter moved to back"
+
+    f = best_feature(["earth", "ingles", "ought", "raked", "those"], 0)
+    @test f.description == "is a word when last letter moved to front"
 end

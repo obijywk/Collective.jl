@@ -56,6 +56,8 @@ function allfeatures()
         @feature(in(word, UNICODE_CHARACTERS), "is the name of a unicode character")
         @feature((in("$c$word", WORDS_SET) for c in 'a':'z'), "is a word when prefixed with '$c'")
         @feature((in("$word$c", WORDS_SET) for c in 'a':'z'), "is a word when suffixed with '$c'")
+        @feature(in(string(word[end:end], word[1:end-1]), WORDS_SET), "is a word when last letter moved to front")
+        @feature(in(string(word[2:end], word[1:1]), WORDS_SET), "is a word when first letter moved to back")
         ]
 end
 
